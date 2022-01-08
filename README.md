@@ -9,7 +9,7 @@
 
 ## Problem Description:
 
-Your task is to build a food recipe management app. This app will help it's users to management food recipes.
+Your task is to build a food recipe management app. This app will help it's users to manage food recipes.
 
 Your recipe data structure looks like the following:
 
