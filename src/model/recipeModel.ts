@@ -31,7 +31,7 @@ const recipeSchema: Schema<Recipe> = new mongoose.Schema({
     required: [true, 'A recipe must have a difficulty level'],
     trim: true,
     enum: {
-      values: ['Beginner', 'Intermediate', 'Advanced'],
+      values: ['beginner', 'intermediate', 'advanced'],
       message: 'Difficulty level is either Beginner, Intermediate or Advanced ',
     },
   },
