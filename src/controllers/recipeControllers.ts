@@ -1,20 +1,48 @@
-import express, { Request, Response, NextFunction } from 'express';
-import { valid } from 'joi';
+import { match } from 'assert';
+import { Request, Response, NextFunction } from 'express';
 import Recipe from '../model/recipeModel';
-import { validateRecipe } from '../validate/validator';
+import { validateRecipe, validateRecipeUpdate } from '../validate/validator';
 
 export const getAllRecipes = async (
   req: Request,
   res: Response,
   next: NextFunction
 ) => {
-  const recipes = await Recipe.find();
+  const queryObj = { ...req.query };
+  const excludedFields = ['page', 'sort', 'limit', 'fields'];
+  excludedFields.forEach((el) => delete queryObj[el]);
+
+  let queryStr = JSON.stringify(queryObj);
+  queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, (match) => `$${match}`);
+
+  const query = Recipe.find(JSON.parse(queryStr));
+  const recipes = await query;
 
   res.status(200).json({
     status: 'success.',
     results: recipes.length,
     data: recipes,
   });
+};
+
+export const getRecipe = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const recipe = await Recipe.findById(req.params.id);
+
+    res.status(200).json({
+      status: 'success',
+      data: recipe,
+    });
+  } catch (err) {
+    res.status(404).json({
+      status: 'fail',
+      message: err,
+    });
+  }
 };
 
 export const createRecipe = async (
@@ -24,7 +52,6 @@ export const createRecipe = async (
 ) => {
   try {
     const Valid = validateRecipe.validate(req.body);
-    console.log(Valid.error?.details[0].message);
     let errorM = Valid.error?.details[0].message;
 
     if (Valid.error) {
@@ -42,6 +69,59 @@ export const createRecipe = async (
     });
   } catch (err) {
     res.status(400).json({
+      status: 'fail',
+      message: err,
+    });
+  }
+};
+
+export const updateRecipe = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const isValid = validateRecipeUpdate.validate(req.body);
+    let errorM = isValid.error?.details[0].message;
+
+    if (isValid.error) {
+      return res.status(400).json({
+        status: 'fail',
+        message: errorM,
+      });
+    }
+
+    const recipe = await Recipe.findByIdAndUpdate(req.params.id, req.body, {
+      new: true,
+      runValidators: true,
+    });
+
+    res.status(200).json({
+      status: 'success',
+      data: recipe,
+    });
+  } catch (err) {
+    res.status(404).json({
+      status: 'fail',
+      message: err,
+    });
+  }
+};
+
+export const deleteRecipe = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const recipe = await Recipe.findByIdAndDelete(req.params.id);
+
+    res.status(204).json({
+      status: 'success',
+      data: null,
+    });
+  } catch (err) {
+    res.status(404).json({
       status: 'fail',
       message: err,
     });

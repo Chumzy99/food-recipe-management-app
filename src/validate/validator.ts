@@ -4,8 +4,17 @@ export const validateRecipe = joi.object({
   title: joi.string().required().trim(),
   meal_type: joi.string().required().trim(),
   difficulty_level: joi.string().required().trim(),
+  createdBy: joi.string().trim(),
   ingredients: joi.string().required().trim(),
   preparation: joi.string().required(),
+});
+
+export const validateRecipeUpdate = joi.object({
+  title: joi.string().trim(),
+  meal_type: joi.string().trim(),
+  difficulty_level: joi.string().trim(),
+  ingredients: joi.string().trim(),
+  preparation: joi.string(),
 });
 
 export const validateUser = joi.object({

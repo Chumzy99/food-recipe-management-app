@@ -1,5 +1,4 @@
 import mongoose, { Schema, Document } from 'mongoose';
-import validator from 'validator';
 
 interface Recipe extends Document {
   title: string;
@@ -7,6 +6,7 @@ interface Recipe extends Document {
   difficulty_level: string;
   ingredients: string;
   preparation: string;
+  createdBy: string | undefined;
   created_At: any;
   updated_At: any;
 }
@@ -43,13 +43,23 @@ const recipeSchema: Schema<Recipe> = new mongoose.Schema({
     type: String,
     required: [true, 'A recipe must have preparation steps!'],
   },
+  // createdBy: {
+  //   type: Schema.Types.ObjectId,
+  //   ref: 'User',
+  //   required: [true, 'Please provide id of user'],
+  // },
+  createdBy: {
+    type: String,
+  },
   created_At: {
     type: Date,
     default: Date.now(),
+    select: false,
   },
   updated_At: {
     type: Date,
     default: Date.now(),
+    select: false,
   },
 });
 
