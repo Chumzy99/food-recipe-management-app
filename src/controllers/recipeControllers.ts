@@ -1,55 +1,44 @@
-import { match } from 'assert';
 import { Request, Response, NextFunction } from 'express';
 import Recipe from '../model/recipeModel';
 import { validateRecipe, validateRecipeUpdate } from '../validate/validator';
 import APIFeatures from '../utils/APIFeatures';
+import catchAsync from '../utils/catchAsync';
+import AppError from '../utils/appError';
 
-export const getAllRecipes = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  // EXECUTE QUERY
-  const features = new APIFeatures(Recipe.find(), req.query)
-    .filter()
-    .sort()
-    .limitFields()
-    .paginate();
-  const recipes = await features.query;
+export const getAllRecipes = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    // EXECUTE QUERY
+    const features = new APIFeatures(Recipe.find(), req.query)
+      .filter()
+      .sort()
+      .limitFields()
+      .paginate();
+    const recipes = await features.query;
 
-  res.status(200).json({
-    status: 'success.',
-    results: recipes.length,
-    data: recipes,
-  });
-};
+    res.status(200).json({
+      status: 'success.',
+      results: recipes.length,
+      data: recipes,
+    });
+  }
+);
 
-export const getRecipe = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  try {
+export const getRecipe = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
     const recipe = await Recipe.findById(req.params.id);
+    if (!recipe) {
+      return next(new AppError(`No document found with that ID`, 404));
+    }
 
     res.status(200).json({
       status: 'success',
       data: recipe,
     });
-  } catch (err) {
-    res.status(404).json({
-      status: 'fail',
-      message: err,
-    });
   }
-};
+);
 
-export const createRecipe = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  try {
+export const createRecipe = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
     const Valid = validateRecipe.validate(req.body);
     let errorM = Valid.error?.details[0].message;
 
@@ -66,28 +55,16 @@ export const createRecipe = async (
       status: 'success',
       data: newRecipe,
     });
-  } catch (err) {
-    res.status(400).json({
-      status: 'fail',
-      message: err,
-    });
   }
-};
+);
 
-export const updateRecipe = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  try {
+export const updateRecipe = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
     const isValid = validateRecipeUpdate.validate(req.body);
     let errorM = isValid.error?.details[0].message;
 
     if (isValid.error) {
-      return res.status(400).json({
-        status: 'fail',
-        message: errorM,
-      });
+      return next(new AppError(errorM, 400));
     }
 
     const recipe = await Recipe.findByIdAndUpdate(req.params.id, req.body, {
@@ -95,44 +72,34 @@ export const updateRecipe = async (
       runValidators: true,
     });
 
+    if (!recipe) {
+      return next(new AppError(`No document found with that ID`, 404));
+    }
+
     res.status(200).json({
       status: 'success',
       data: recipe,
     });
-  } catch (err) {
-    res.status(404).json({
-      status: 'fail',
-      message: err,
-    });
   }
-};
+);
 
-export const deleteRecipe = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  try {
+export const deleteRecipe = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
     const recipe = await Recipe.findByIdAndDelete(req.params.id);
+
+    if (!recipe) {
+      return next(new AppError(`No document found with that ID`, 404));
+    }
 
     res.status(204).json({
       status: 'success',
       data: null,
     });
-  } catch (err) {
-    res.status(404).json({
-      status: 'fail',
-      message: err,
-    });
   }
-};
+);
 
-export const getRecipeStats = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  try {
+export const getRecipeStats = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
     const stats = await Recipe.aggregate([
       {
         $match: { preparationMinutes: { $gte: 40 } },
@@ -155,16 +122,5 @@ export const getRecipeStats = async (
       status: 'success',
       data: stats,
     });
-  } catch (err) {
-    res.status(404).json({
-      status: 'fail',
-      message: err,
-    });
   }
-};
-
-export const getRecipePlan = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {};
+);

@@ -9,7 +9,7 @@
   "scripts": {
     "start": "node dist/server.js",
     "dev": "nodemon dist/server.js",
-    "prod": "NODE_ENV=production nodemon dist/server.js",
+    "prod": "ENVIRONMENT=production nodemon dist/server.js",
     "build": "tsc -w"
   },
   "devDependencies": {
