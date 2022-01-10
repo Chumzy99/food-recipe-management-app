@@ -3,6 +3,7 @@ import joi from 'joi';
 export const validateRecipe = joi.object({
   title: joi.string().required().trim(),
   meal_type: joi.string().required().trim(),
+  preparationMinutes: joi.number().required(),
   difficulty_level: joi.string().required().trim(),
   createdBy: joi.string().trim(),
   ingredients: joi.string().required().trim(),
@@ -15,6 +16,7 @@ export const validateRecipeUpdate = joi.object({
   difficulty_level: joi.string().trim(),
   ingredients: joi.string().trim(),
   preparation: joi.string(),
+  preparationMinutes: joi.number(),
 });
 
 export const validateUser = joi.object({

@@ -2,21 +2,20 @@ import { match } from 'assert';
 import { Request, Response, NextFunction } from 'express';
 import Recipe from '../model/recipeModel';
 import { validateRecipe, validateRecipeUpdate } from '../validate/validator';
+import APIFeatures from '../utils/APIFeatures';
 
 export const getAllRecipes = async (
   req: Request,
   res: Response,
   next: NextFunction
 ) => {
-  const queryObj = { ...req.query };
-  const excludedFields = ['page', 'sort', 'limit', 'fields'];
-  excludedFields.forEach((el) => delete queryObj[el]);
-
-  let queryStr = JSON.stringify(queryObj);
-  queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, (match) => `$${match}`);
-
-  const query = Recipe.find(JSON.parse(queryStr));
-  const recipes = await query;
+  // EXECUTE QUERY
+  const features = new APIFeatures(Recipe.find(), req.query)
+    .filter()
+    .sort()
+    .limitFields()
+    .paginate();
+  const recipes = await features.query;
 
   res.status(200).json({
     status: 'success.',
@@ -127,3 +126,45 @@ export const deleteRecipe = async (
     });
   }
 };
+
+export const getRecipeStats = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const stats = await Recipe.aggregate([
+      {
+        $match: { preparationMinutes: { $gte: 40 } },
+      },
+      {
+        $group: {
+          _id: { $toUpper: '$difficulty_level' },
+          num: { $sum: 1 },
+          avgMinutes: { $avg: '$preparationMinutes' },
+          maxTime: { $max: '$preparationMinutes' },
+          minTime: { $min: '$preparationMinutes' },
+        },
+      },
+      {
+        $sort: { avgMinutes: 1 },
+      },
+    ]);
+
+    res.status(200).json({
+      status: 'success',
+      data: stats,
+    });
+  } catch (err) {
+    res.status(404).json({
+      status: 'fail',
+      message: err,
+    });
+  }
+};
+
+export const getRecipePlan = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {};
