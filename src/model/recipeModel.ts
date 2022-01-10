@@ -82,6 +82,9 @@ recipeSchema.virtual('preparationTimeInHours').get(function (this: IRecipe) {
   return time;
 });
 
+// recipeSchema.pre('findOneAndUpdate', function(next) {
+// })
+
 const Recipe = mongoose.model('Recipe', recipeSchema);
 
 export default Recipe;
