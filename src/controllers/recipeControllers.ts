@@ -40,13 +40,10 @@ export const getRecipe = catchAsync(
 export const createRecipe = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const Valid = validateRecipe.validate(req.body);
-    let errorM = Valid.error?.details[0].message;
+    let errorM: string = Valid.error?.details[0].message!;
 
     if (Valid.error) {
-      return res.status(400).json({
-        status: 'fail',
-        message: errorM,
-      });
+      return next(new AppError(errorM, 400));
     }
 
     const newRecipe = await Recipe.create(req.body);
@@ -62,6 +59,7 @@ export const updateRecipe = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const isValid = validateRecipeUpdate.validate(req.body);
     let errorM = isValid.error?.details[0].message;
+    // console.log(errorM);
 
     if (isValid.error) {
       return next(new AppError(errorM, 400));

@@ -19,7 +19,7 @@ export const validateRecipeUpdate = joi.object({
   preparationMinutes: joi.number(),
 });
 
-export const validateUser = joi.object({
+export const validateSignup = joi.object({
   email: joi.string().trim().email().required(),
   fullname: joi.string().required().min(1).max(50),
   password: joi.string().required().pattern(new RegExp('^[a-zA-Z0-9]{3,30}$')),

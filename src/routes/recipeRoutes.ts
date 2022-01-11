@@ -1,4 +1,5 @@
 import express, { Application } from 'express';
+import { protect } from '../controllers/authController';
 import {
   getAllRecipes,
   createRecipe,
@@ -11,6 +12,7 @@ import {
 const router = express.Router();
 
 router.route('/recipe-stats').get(getRecipeStats);
-router.route('/').get(getAllRecipes).post(createRecipe);
+
+router.route('/').get(protect, getAllRecipes).post(createRecipe);
 router.route('/:id').get(getRecipe).patch(updateRecipe).delete(deleteRecipe);
 export default router;

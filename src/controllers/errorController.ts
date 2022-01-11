@@ -52,17 +52,17 @@ export const globalErrorHandler: ErrorRequestHandler = (
   res,
   next
 ) => {
-  console.log(err.stack);
+  // console.log(err.stack);
 
   err.statusCode = err.statusCode || 500;
   err.status = err.status || 'error';
 
-  let errorStr = JSON.stringify(err);
-  let error = JSON.parse(errorStr);
-
   if (process.env.ENVIRONMENT === 'developement') {
     sendErrorDev(err, req, res, next);
   } else if (process.env.ENVIRONMENT === 'production') {
+    let errorStr = JSON.stringify(err);
+    let error = JSON.parse(errorStr);
+
     // CastError
     if (error.name === 'CastError') {
       error = handleCastErrorDB(error, req, res, next);

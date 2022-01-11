@@ -1,15 +1,18 @@
 import mongoose, { Schema, Document } from 'mongoose';
 import validator from 'validator';
+import bcrypt from 'bcryptjs';
 
-interface User extends Document {
+export interface IUser extends Document {
   email: string;
   password: string;
   fullname: string;
   created_At: any;
   updated_At: any;
+
+  correctPassword(candidatePassword: string, userPassword: string): boolean;
 }
 
-const userSchema: Schema<User> = new mongoose.Schema({
+const userSchema: Schema<IUser> = new mongoose.Schema({
   email: {
     type: String,
     required: [true, 'A recipe must have a title'],
@@ -39,6 +42,21 @@ const userSchema: Schema<User> = new mongoose.Schema({
     default: Date.now(),
   },
 });
+
+userSchema.pre('save', async function (this: IUser, next) {
+  // run if password is actually modified;
+  if (!this.isModified('password')) return next();
+
+  this.password = await bcrypt.hash(this.password, 12);
+  next();
+});
+
+userSchema.methods.correctPassword = async function (
+  candidatePassword: string,
+  userPassword: string
+) {
+  return await bcrypt.compare(candidatePassword, userPassword);
+};
 
 const User = mongoose.model('User', userSchema);
 export default User;
