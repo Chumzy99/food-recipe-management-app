@@ -5,7 +5,7 @@ export const validateRecipe = joi.object({
   meal_type: joi.string().required().trim(),
   preparationMinutes: joi.number().required(),
   difficulty_level: joi.string().required().trim(),
-  createdBy: joi.string().trim(),
+  createdBy: joi.object(),
   ingredients: joi.string().required().trim(),
   preparation: joi.string().required(),
 });
@@ -17,6 +17,7 @@ export const validateRecipeUpdate = joi.object({
   ingredients: joi.string().trim(),
   preparation: joi.string(),
   preparationMinutes: joi.number(),
+  createdBy: joi.object(),
 });
 
 export const validateSignup = joi.object({
@@ -34,5 +35,4 @@ export const validateIngredient = joi.object({
   name: joi.string().trim().required(),
   price: joi.number().required(),
   recipe: joi.string().trim(),
-  user: joi.string().trim(),
 });

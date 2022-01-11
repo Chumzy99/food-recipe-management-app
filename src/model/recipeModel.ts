@@ -51,14 +51,14 @@ const recipeSchema: Schema<IRecipe> = new mongoose.Schema(
       type: String,
       required: [true, 'A recipe must have preparation steps!'],
     },
-    // createdBy: {
-    //   type: Schema.Types.ObjectId,
-    //   ref: 'User',
-    //   required: [true, 'Please provide id of user'],
-    // },
     createdBy: {
-      type: String,
+      type: Schema.Types.ObjectId,
+      ref: 'User',
+      required: [true, 'Please provide id of user'],
     },
+    // createdBy: {
+    //   type: String,
+    // },
     created_At: {
       type: Date,
       default: Date.now(),

@@ -4,7 +4,6 @@ interface Ingredient extends Document {
   name: string;
   price: number;
   recipe: string | undefined;
-  user: string | undefined;
 }
 
 const ingredientSchema: Schema<Ingredient> = new mongoose.Schema({
@@ -20,11 +19,6 @@ const ingredientSchema: Schema<Ingredient> = new mongoose.Schema({
     type: Schema.Types.ObjectId,
     ref: 'Recipe',
     required: [true, 'Please provide recipe!'],
-  },
-  user: {
-    type: Schema.Types.ObjectId,
-    ref: 'User',
-    required: [true, 'Please provide user!'],
   },
 });
 

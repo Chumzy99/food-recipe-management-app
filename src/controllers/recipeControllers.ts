@@ -4,9 +4,10 @@ import { validateRecipe, validateRecipeUpdate } from '../validate/validator';
 import APIFeatures from '../utils/APIFeatures';
 import catchAsync from '../utils/catchAsync';
 import AppError from '../utils/appError';
+import { CustomUserReq } from '../model/custom';
 
-export const getAllRecipes = catchAsync(
-  async (req: Request, res: Response, next: NextFunction) => {
+export const getEveryRecipe = catchAsync(
+  async (req: CustomUserReq, res: Response, next: NextFunction) => {
     // EXECUTE QUERY
     const features = new APIFeatures(Recipe.find(), req.query)
       .filter()
@@ -23,9 +24,31 @@ export const getAllRecipes = catchAsync(
   }
 );
 
+export const getAllRecipes = catchAsync(
+  async (req: CustomUserReq, res: Response, next: NextFunction) => {
+    console.log(req.user);
+    // EXECUTE QUERY
+    const features = new APIFeatures(
+      Recipe.find({ createdBy: req.user?._id }),
+      req.query
+    )
+      .filter()
+      .sort()
+      .limitFields()
+      .paginate();
+    const recipes = await features.query;
+
+    res.status(200).json({
+      status: 'success.',
+      results: recipes.length,
+      data: recipes,
+    });
+  }
+);
+
 export const getRecipe = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
-    const recipe = await Recipe.findById(req.params.id);
+    const recipe = await Recipe.findById(req.params.id).populate('createdBy');
     if (!recipe) {
       return next(new AppError(`No document found with that ID`, 404));
     }
@@ -38,15 +61,18 @@ export const getRecipe = catchAsync(
 );
 
 export const createRecipe = catchAsync(
-  async (req: Request, res: Response, next: NextFunction) => {
-    const Valid = validateRecipe.validate(req.body);
+  async (req: CustomUserReq, res: Response, next: NextFunction) => {
+    console.log(typeof req.user?._id);
+    let fullBody = { ...req.body, createdBy: req.user?._id };
+    console.log(fullBody);
+    const Valid = validateRecipe.validate(fullBody);
     let errorM: string = Valid.error?.details[0].message!;
 
     if (Valid.error) {
       return next(new AppError(errorM, 400));
     }
 
-    const newRecipe = await Recipe.create(req.body);
+    const newRecipe = await Recipe.create(fullBody);
 
     res.status(201).json({
       status: 'success',

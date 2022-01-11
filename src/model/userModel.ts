@@ -8,8 +8,11 @@ export interface IUser extends Document {
   fullname: string;
   created_At: any;
   updated_At: any;
+  passwordChangedAt: any;
+  active: boolean;
 
   correctPassword(candidatePassword: string, userPassword: string): boolean;
+  changedPasswordAfter(JWTTimestamp: Date): boolean;
 }
 
 const userSchema: Schema<IUser> = new mongoose.Schema({
@@ -41,6 +44,14 @@ const userSchema: Schema<IUser> = new mongoose.Schema({
     type: Date,
     default: Date.now(),
   },
+  passwordChangedAt: {
+    type: Date,
+  },
+  active: {
+    type: Boolean,
+    default: true,
+    select: false,
+  },
 });
 
 userSchema.pre('save', async function (this: IUser, next) {
@@ -51,11 +62,30 @@ userSchema.pre('save', async function (this: IUser, next) {
   next();
 });
 
+userSchema.pre(/^find/, function (this: any, next) {
+  this.find({ active: { $ne: false } });
+  next();
+});
+
 userSchema.methods.correctPassword = async function (
   candidatePassword: string,
   userPassword: string
 ) {
   return await bcrypt.compare(candidatePassword, userPassword);
+};
+
+userSchema.methods.changedPasswordAfter = function (JWTTimestamp: any) {
+  if (this.passwordChangedAt) {
+    let changedTimestamp = this.passwordChangedAt.getTime() / 1000;
+
+    changedTimestamp = parseInt(changedTimestamp.toString(), 10);
+
+    // console.log(changedTimestamp, JWTTimestamp);
+    return JWTTimestamp < changedTimestamp;
+  }
+
+  // falsle means not changed
+  return false;
 };
 
 const User = mongoose.model('User', userSchema);
