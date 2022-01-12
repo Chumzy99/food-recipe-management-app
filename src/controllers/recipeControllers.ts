@@ -62,9 +62,9 @@ export const getRecipe = catchAsync(
 
 export const createRecipe = catchAsync(
   async (req: CustomUserReq, res: Response, next: NextFunction) => {
-    console.log(typeof req.user?._id);
+    // console.log(typeof req.user?._id);
     let fullBody = { ...req.body, createdBy: req.user?._id };
-    console.log(fullBody);
+    // console.log(fullBody);
     const Valid = validateRecipe.validate(fullBody);
     let errorM: string = Valid.error?.details[0].message!;
 

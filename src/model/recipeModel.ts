@@ -1,3 +1,4 @@
+import { required } from 'joi';
 import mongoose, { Schema, Document } from 'mongoose';
 
 interface IRecipe extends Document {
@@ -43,10 +44,13 @@ const recipeSchema: Schema<IRecipe> = new mongoose.Schema(
           'Difficulty level is either Beginner, Intermediate or Advanced ',
       },
     },
-    ingredients: {
-      type: String,
-      required: [true, 'A recipe ingredients must be provided!'],
-    },
+    ingredients: [
+      {
+        name: String,
+        price: Number,
+      },
+      // required: [true, "ingredient(s) for recipe should be provided"]
+    ],
     preparation: {
       type: String,
       required: [true, 'A recipe must have preparation steps!'],
@@ -56,9 +60,6 @@ const recipeSchema: Schema<IRecipe> = new mongoose.Schema(
       ref: 'User',
       required: [true, 'Please provide id of user'],
     },
-    // createdBy: {
-    //   type: String,
-    // },
     created_At: {
       type: Date,
       default: Date.now(),
