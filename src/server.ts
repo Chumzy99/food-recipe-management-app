@@ -13,19 +13,19 @@ process.on('uncaughtException', (err) => {
 dotenv.config();
 import app from './app';
 
-const DB = process.env.MONGO_URL?.replace(
-  '<password>',
-  process.env.MONGO_PASSWORD!
-) as string;
+// const DB = process.env.MONGO_URL?.replace(
+//   '<password>',
+//   process.env.MONGO_PASSWORD!
+// ) as string;
 
-mongoose
-  .connect(DB)
-  .then(() => {
-    console.log('DB connection successful....!!!');
-  })
-  .catch((err) => {
-    console.log(err);
-  });
+// mongoose
+//   .connect(DB)
+//   .then(() => {
+//     console.log('DB connection successful....!!!');
+//   })
+//   .catch((err) => {
+//     console.log(err);
+//   });
 
 const port = process.env.PORT || 3001;
 

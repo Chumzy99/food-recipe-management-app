@@ -5,11 +5,14 @@ import helmet from 'helmet';
 import xss from 'xss-clean';
 import hpp from 'hpp';
 import mongoSanitize from 'express-mongo-sanitize';
+import dotenv from 'dotenv';
+dotenv.config();
 
 import AppError from './utils/appError';
 import { globalErrorHandler } from './controllers/errorController';
 import recipeRouter from './routes/recipeRoutes';
 import userRouter from './routes/userRoutes';
+import { mongoDBConnect, mongoMockConnect } from './database/db';
 
 const app: Application = express();
 
@@ -20,7 +23,7 @@ app.use(express.json());
 app.use(helmet());
 
 // Dev logging
-if (process.env.ENVIRONMENT === 'developement') {
+if (process.env.NODE_ENV === 'development') {
   app.use(morgan('dev'));
 }
 
@@ -44,6 +47,12 @@ app.use(
     whitelist: ['meal_type', 'difficulty_level'],
   })
 );
+
+if (process.env.NODE_ENV === 'test') {
+  mongoMockConnect();
+} else {
+  mongoDBConnect();
+}
 
 app.use('/api/v1/recipes', recipeRouter);
 app.use('/api/v1/users', userRouter);
