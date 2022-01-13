@@ -4,7 +4,7 @@ import app from '../app';
 let token = '';
 let recipeId = '';
 
-//SIGN UP
+//SIGN UP Test
 describe('User Authentication', () => {
   it('A user should be created', async () => {
     const data = {
