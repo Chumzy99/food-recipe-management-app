@@ -8,6 +8,7 @@ import { CustomUserReq } from '../model/custom';
 
 export const getEveryRecipe = catchAsync(
   async (req: CustomUserReq, res: Response, next: NextFunction) => {
+    // console.log('yessssss');
     // EXECUTE QUERY
     const features = new APIFeatures(Recipe.find(), req.query)
       .filter()

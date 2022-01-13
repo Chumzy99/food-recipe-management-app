@@ -60,13 +60,12 @@ export const globalErrorHandler: ErrorRequestHandler = (
   next
 ) => {
   // console.log(err.stack);
-
   err.statusCode = err.statusCode || 500;
   err.status = err.status || 'error';
 
-  if (process.env.ENVIRONMENT === 'developement') {
+  if (process.env.NODE_ENV === 'development') {
     sendErrorDev(err, req, res, next);
-  } else if (process.env.ENVIRONMENT === 'production') {
+  } else if (process.env.NODE_ENV === 'production') {
     let errorStr = JSON.stringify(err);
     let error = JSON.parse(errorStr);
 

@@ -87,6 +87,21 @@ export const login = catchAsync(
   }
 );
 
+export const logout = catchAsync(
+  async (req: CustomUserReq, res: Response, next: NextFunction) => {
+    console.log(req.headers.authorization);
+    console.log(req.user);
+
+    req.user = undefined;
+    req.headers.authorization = undefined;
+    res.clearCookie('jwt');
+
+    res.status(200).json({
+      status: 'success',
+    });
+  }
+);
+
 export const protect = catchAsync(
   async (req: CustomUserReq, res: Response, next: NextFunction) => {
     let token;
@@ -134,6 +149,7 @@ export const protect = catchAsync(
     }
 
     req.user = freshUser;
+
     next();
   }
 );

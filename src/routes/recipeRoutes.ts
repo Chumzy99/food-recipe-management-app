@@ -13,6 +13,8 @@ import {
 
 const router = express.Router();
 
+router.use(protect);
+
 router.route('/recipe-stats').get(getRecipeStats);
 router.route('/every').get(getEveryRecipe);
 

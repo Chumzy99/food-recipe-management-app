@@ -13,7 +13,7 @@ import { globalErrorHandler } from './controllers/errorController';
 import recipeRouter from './routes/recipeRoutes';
 import userRouter from './routes/userRoutes';
 import { mongoDBConnect, mongoMockConnect } from './database/db';
-import { protect } from './controllers/authController';
+// import { protect } from './controllers/authController';
 
 const app: Application = express();
 
@@ -54,7 +54,6 @@ if (process.env.NODE_ENV === 'test') {
 } else {
   mongoDBConnect();
 }
-app.use('/', protect);
 
 app.use('/api/v1/recipes', recipeRouter);
 app.use('/api/v1/users', userRouter);

@@ -6,7 +6,7 @@ export const validateRecipe = joi.object({
   preparationMinutes: joi.number().required(),
   difficulty_level: joi.string().required().trim(),
   createdBy: joi.object(),
-  ingredients: joi.string().required().trim(),
+  ingredients: joi.array(),
   preparation: joi.string().required(),
 });
 
